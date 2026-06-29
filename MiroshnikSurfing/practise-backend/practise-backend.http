@@ -1,0 +1,6 @@
+@practise_backend_HostAddress = http://localhost:5130
+
+GET {{practise_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

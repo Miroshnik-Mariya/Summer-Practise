@@ -1,0 +1,107 @@
+<app-header-small></app-header-small>
+<div class="auth-page">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-6 col-xl-5">
+        <div class="card shadow auth-card">
+          <div class="card-header text-white py-3 text-center">
+            <h2 class="mb-0">Авторизация</h2>
+          </div>
+
+          <div class="card-body p-4">
+            <form #authForm="ngForm" (ngSubmit)="onSubmit()">
+              <!-- Логин или эл. почта -->
+              <div class="mb-3">
+                <label for="login" class="form-label fw-semibold">Логин или эл. почта*</label>
+                <input 
+                  id="login" 
+                  #loginInput
+                  class="form-control" 
+                  type="text" 
+                  placeholder="Введите логин или эл. почту"
+                  required
+                  maxlength="31"
+                  pattern="[a-zA-Zа-яА-ЯёЁ0-9_@.]+"
+                  [(ngModel)]="user.login" 
+                  name="login"
+                  [class.is-invalid]="shouldShowError('login')"
+                  (input)="onInputChange()"
+                >
+                <div *ngIf="shouldShowError('login')" class="invalid-feedback d-block">
+                  {{ getFieldError('login') }}
+                </div>
+              </div>
+
+              <!-- Пароль -->
+              <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">Пароль*</label>
+                <div class="input-group">
+                  <input 
+                    id="password" 
+                    class="form-control" 
+                    placeholder="Введите пароль"
+                    required
+                    minlength="6"
+                    maxlength="20"
+                    [type]="showPassword ? 'text' : 'password'"
+                    [(ngModel)]="user.password" 
+                    name="password"
+                    [class.is-invalid]="shouldShowError('password')"
+                    (input)="onInputChange()"
+                  >
+                  <button type="button" class="btn btn-outline-secondary" (click)="togglePasswordVisibility()">
+                    <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                  </button>
+                </div>
+                <div *ngIf="shouldShowError('password')" class="invalid-feedback d-block">
+                  {{ getFieldError('password') }}
+                </div>
+              </div>
+
+              <!-- Общая ошибка -->
+              <div *ngIf="errorMessage" class="alert alert-danger text-center">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ errorMessage }}
+              </div>
+
+              <p class="text-muted small text-center">* - поля, обязательные для заполнения</p>
+
+              <!-- Кнопки -->
+              <div class="d-grid gap-2 mt-3">
+                <button 
+                  type="submit" 
+                  class="btn btn-primary btn-lg exit"
+                  [disabled]="isLoading"
+                >
+                  <span *ngIf="!isLoading">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                  </span>
+                  <span *ngIf="isLoading">
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Вход...
+                  </span>
+                </button>
+
+                <div class="row">
+                  <a 
+                    routerLink="/reset-password" 
+                    class="btn btn-outline-secondary flex-fill text-center"
+                  >
+                    <i class="bi bi-key me-2"></i>Забыли пароль?
+                  </a>
+                  
+                  <a 
+                    routerLink="/registration" 
+                    class="btn btn-outline-primary flex-fill text-center"
+                  >
+                    <i class="bi bi-person-plus me-2"></i>Регистрация
+                  </a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

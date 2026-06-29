@@ -1,0 +1,88 @@
+/* header-small.css */
+.header-small {
+  background: #4C5768; /* Серый фон */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 70px; /* Фиксированная высота */
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+}
+
+.header-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Логотип */
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-link {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 32px; /* Крупный шрифт */
+  color: #ffffff;
+  transition: opacity 0.3s;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
+.logo-text {
+  letter-spacing: 1px;
+  align-items: start;
+}
+
+/* Навигация */
+.nav-desktop {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.nav-desktop a {
+  padding: 8px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.nav-desktop a:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #ffffff;
+}
+
+.nav-desktop a.active {
+  background: #ffffff;
+  color: white;
+}
+
+.nav-buttons {
+  font-size: 14px;
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 24px;
+  }
+  
+  .nav-desktop a {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}

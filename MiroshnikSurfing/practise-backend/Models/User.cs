@@ -1,0 +1,16 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
+public class User
+{
+    public int Id {get; set;}
+    public string? Nickname {get; set;}
+    public string? Email {get; set;}
+    public string? Password {get; set;}
+
+    public string? Name {get; set;}
+    public string? Surname {get; set;}
+    public string? ContactInfo {get; set;}
+    public string? UserInfo {get; set;}
+    public string? Achievement {get; set;}
+    public string? Image {get; set;}
+}

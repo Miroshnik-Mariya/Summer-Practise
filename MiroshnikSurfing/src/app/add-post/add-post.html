@@ -1,0 +1,84 @@
+<app-header-small></app-header-small>
+
+<div class="add-post-page">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <div class="form-add-post">
+          <!-- Заголовок -->
+          <div class="label-add-post">
+            <h2>Расскажите, как у вас дела ;)</h2>
+          </div>
+
+          <!-- Поле ввода текста -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Текст поста</label>
+            <textarea
+              class="form-control"
+              rows="6"
+              placeholder="Что у вас нового? Поделитесь с друзьями..."
+              maxlength="1000"
+              [(ngModel)]="post.content"
+              #contentInput="ngModel"
+            ></textarea>
+            <div class="form-text text-muted text-end">
+              {{ post.content.length }}/1000 символов
+            </div>
+          </div>
+
+          <!-- Превью изображения -->
+          <div *ngIf="imagePreview" class="image-preview-wrapper">
+            <img [src]="imagePreview" alt="Превью" class="image-preview">
+            <button type="button" class="btn-remove-image" (click)="removeImage()">
+              <i class="bi bi-x-circle"></i>
+            </button>
+          </div>
+
+          <!-- Ошибка -->
+          <div *ngIf="errorMessage" class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ errorMessage }}
+          </div>
+
+          <!-- Кнопки -->
+          <div class="button-group">
+            <!-- Кнопка "Обзор" для выбора изображения -->
+            <label for="fileInput" class="btn btn-outline-secondary">
+              <i class="bi bi-image me-2"></i>Обзор
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                style="display: none"
+              >
+            </label>
+
+            <!-- Кнопка "Добавить" для публикации -->
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isLoading || !post.content.trim()"
+              (click)="onSubmit()"
+            >
+              <span *ngIf="!isLoading">
+                <i class="bi bi-plus-circle me-2"></i>Добавить
+              </span>
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Публикация...
+              </span>
+            </button>
+          </div>
+
+          <!-- Кнопка "Отмена" -->
+          <div class="mt-2">
+            <button type="button" class="btn btn-link text-muted" (click)="goBack()">
+              <i class="bi bi-arrow-left me-2"></i>Отмена
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

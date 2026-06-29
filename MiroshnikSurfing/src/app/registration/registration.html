@@ -1,0 +1,233 @@
+<app-header-small></app-header-small>
+<div class="register-page">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
+        <div class="card shadow register-card">
+          <div class="card-header text-white py-3">
+            <h2 class="mb-0">Регистрация</h2>
+          </div>
+
+          <div class="card-body p-4">
+            <form #registerForm="ngForm">
+
+              <div class="row g-4 align-items-start">
+                <!-- Левая колонка -->
+                <div class="col-12 col-lg-7">
+                  <!-- Псевдоним -->
+                  <div class="mb-3">
+                    <label for="nickname" class="form-label fw-semibold">Псевдоним*</label>
+                    <input 
+                      id="nickname" 
+                      class="form-control" 
+                      type="text" 
+                      placeholder="Введите псевдоним"
+                      required 
+                      minlength="3"
+                      maxlength="20"
+                      pattern="[a-zA-Zа-яА-ЯёЁ0-9_]+"
+                      [(ngModel)]="user.nickname" 
+                      name="nickname"
+                      #nicknameInput="ngModel"
+                    >
+                    <!-- Ошибки для псевдонима -->
+                    <div *ngIf="shouldShowError('nickname')" class="invalid-feedback d-block">
+                      {{ getFieldError('nickname') }}
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">Email*</label>
+                    <input 
+                      id="email" 
+                      class="form-control" 
+                      type="email" 
+                      placeholder="Введите эл. почту"
+                      required 
+                      maxlength="31"
+                      email
+                      [(ngModel)]="user.email" 
+                      name="email"
+                      #emailInput="ngModel"
+                    >
+                    <!-- Ошибки для email -->
+                    <div *ngIf="shouldShowError('email')" class="invalid-feedback d-block">
+                      {{ getFieldError('email') }}
+                    </div>
+                  </div>
+
+                  <!-- Пароль -->
+                  <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold">Пароль*</label>
+                    <div class="input-group">
+                      <input 
+                        id="password" 
+                        class="form-control" 
+                        placeholder="Введите пароль"
+                        required 
+                        minlength="6"
+                        maxlength="20"
+                        pattern="[\w+]+"
+                        [type]="showPassword ? 'text' : 'password'"
+                        [(ngModel)]="user.password" 
+                        name="password"
+                        #passwordInput="ngModel"
+                      >
+                      <button type="button" class="btn btn-outline-secondary" (click)="togglePasswordVisibility()">
+                        <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                      </button>
+                    </div>
+                    <!-- Ошибки для пароля -->
+                    <div *ngIf="shouldShowError('password')" class="invalid-feedback d-block">
+                      {{ getFieldError('password') }}
+                    </div>
+                  </div>
+
+                  <!-- Имя -->
+                  <div class="mb-3">
+                    <label for="firstname" class="form-label fw-semibold">Имя</label>
+                    <input 
+                      id="firstname" 
+                      class="form-control" 
+                      type="text" 
+                      placeholder="Введите имя" 
+                      maxlength="31"
+                      [(ngModel)]="user.firstname" 
+                      name="firstname"
+                      #firstnameInput="ngModel"
+                    >
+                    <div *ngIf="shouldShowError('firstname')" class="invalid-feedback d-block">
+                      {{ getFieldError('firstname') }}
+                    </div>
+                  </div>
+
+                  <!-- Фамилия -->
+                  <div class="mb-3">
+                    <label for="lastname" class="form-label fw-semibold">Фамилия</label>
+                    <input 
+                      id="lastname" 
+                      class="form-control" 
+                      type="text" 
+                      placeholder="Введите фамилию" 
+                      maxlength="31"
+                      [(ngModel)]="user.lastname" 
+                      name="lastname"
+                      #lastnameInput="ngModel"
+                    >
+                    <div *ngIf="shouldShowError('lastname')" class="invalid-feedback d-block">
+                      {{ getFieldError('lastname') }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Правая колонка -->
+                <div class="col-12 col-lg-5">
+                  <div class="avatar-wrap">
+                    <div class="avatar-upload" (click)="fileInput.click()">
+                      <img *ngIf="user.photo" [src]="user.photo" alt="Аватар" class="avatar-image">
+                      <div *ngIf="!user.photo" class="avatar-placeholder">
+                        <i class="bi bi-person fs-1"></i>
+                        <div class="small">Выбрать аватар</div>
+                      </div>
+                    </div>
+                    <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" hidden>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <!-- Контакты -->
+                <div class="mb-3">
+                  <label for="contacts" class="form-label fw-semibold">Контактная информация</label>
+                  <textarea 
+                    id="contacts" 
+                    class="form-control" 
+                    placeholder="Расскажите, как с вами связаться" 
+                    maxlength="255"
+                    [(ngModel)]="user.contacts" 
+                    name="contacts" 
+                    rows="4"
+                    #contactsInput="ngModel"
+                  ></textarea>
+                  <div *ngIf="shouldShowError('contacts')" class="invalid-feedback d-block">
+                    {{ getFieldError('contacts') }}
+                  </div>
+                </div>
+
+                <!-- О себе -->
+                <div class="mb-3">
+                  <label for="aboutMyself" class="form-label fw-semibold">О себе</label>
+                  <textarea 
+                    id="aboutMyself" 
+                    class="form-control" 
+                    placeholder="Расскажите о себе" 
+                    maxlength="255"
+                    [(ngModel)]="user.aboutMyself" 
+                    name="aboutMyself" 
+                    rows="4"
+                    #aboutMyselfInput="ngModel"
+                  ></textarea>
+                  <div *ngIf="shouldShowError('aboutMyself')" class="invalid-feedback d-block">
+                    {{ getFieldError('aboutMyself') }}
+                  </div>
+                </div>
+
+                <!-- Достижения -->
+                <div class="mb-4">
+                  <label for="achievements" class="form-label fw-semibold">Достижения</label>
+                  <textarea 
+                    id="achievements" 
+                    class="form-control" 
+                    placeholder="Расскажите о своих достижениях" 
+                    maxlength="255"
+                    [(ngModel)]="user.achievements" 
+                    name="achievements" 
+                    rows="4"
+                    #achievementsInput="ngModel"
+                  ></textarea>
+                  <div *ngIf="shouldShowError('achievements')" class="invalid-feedback d-block">
+                    {{ getFieldError('achievements') }}
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-muted small">* - поля, обязательные для заполнения</p>
+
+              <!-- Сообщение об общей ошибке -->
+              <div *ngIf="isSubmitted && registerForm?.invalid" class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Заполнены не все обязательные поля!
+              </div>
+
+              <!-- Кнопки -->
+              <div class="d-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button 
+                  type="submit" 
+                  class="btn btn-primary btn-lg"
+                  [disabled]="isLoading"
+                  (click)="onSubmit()"
+                >
+                  <span *ngIf="!isLoading">
+                    <i class="bi bi-person-plus me-2"></i>Зарегистрироваться
+                  </span>
+                  <span *ngIf="isLoading">
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Регистрация...
+                  </span>
+                </button>
+
+                <a 
+                  routerLink="/authorization" 
+                  class="btn btn-outline-secondary d-flex align-items-center justify-content-center"
+                >
+                  <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
