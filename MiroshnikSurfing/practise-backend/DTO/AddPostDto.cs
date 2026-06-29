@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations.Schema; 
 public class AddPostDto
 {
-    public string? Text {get; set;}
-    public int? UserId {get; set;}
-    [ForeignKey("UserId")]
-    public string? Photo{get;set;}
+    public string? Text { get; set; }              // Текст поста
+    public string? Photo { get; set; }             // Фото поста (base64 или путь)
+    public string? AuthorNickname { get; set; }    // Никнейм автора (для поиска)
 }
