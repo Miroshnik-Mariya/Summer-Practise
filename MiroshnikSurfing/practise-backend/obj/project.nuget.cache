@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7ZGz1mwIQ0g=",
+  "dgSpecHash": "H3Mq3SELfoY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\SMS-IT-MiroshnikM\\MiroshnikSurfing\\practise-backend\\practise-backend.csproj",
+  "projectFilePath": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\Summer-Practise\\MiroshnikSurfing\\practise-backend\\practise-backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\79033\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.9\\microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
     "C:\\Users\\79033\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.4\\microsoft.entityframeworkcore.8.0.4.nupkg.sha512",

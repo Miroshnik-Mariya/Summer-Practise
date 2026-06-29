@@ -693,11 +693,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\SMS-IT-MiroshnikM\\MiroshnikSurfing\\practise-backend\\practise-backend.csproj",
+      "projectUniqueName": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\Summer-Practise\\MiroshnikSurfing\\practise-backend\\practise-backend.csproj",
       "projectName": "practise-backend",
-      "projectPath": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\SMS-IT-MiroshnikM\\MiroshnikSurfing\\practise-backend\\practise-backend.csproj",
+      "projectPath": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\Summer-Practise\\MiroshnikSurfing\\practise-backend\\practise-backend.csproj",
       "packagesPath": "C:\\Users\\79033\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\SMS-IT-MiroshnikM\\MiroshnikSurfing\\practise-backend\\obj\\",
+      "outputPath": "C:\\Users\\79033\\OneDrive\\Документы\\GitHub\\Summer-Practise\\MiroshnikSurfing\\practise-backend\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\79033\\AppData\\Roaming\\NuGet\\NuGet.Config"

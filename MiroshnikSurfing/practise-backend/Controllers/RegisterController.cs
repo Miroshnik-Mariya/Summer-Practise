@@ -30,14 +30,13 @@ public class RegisterController : ControllerBase
             {
                 Nickname = registerRequest.Nickname,
                 Email = registerRequest.Email,
-                Password = registerRequest.Password, // В реальном проекте - хешируйте!
+                Password = registerRequest.Password, 
                 Name = registerRequest.Name,
                 Surname = registerRequest.Surname,
                 ContactInfo = registerRequest.ContactInfo,
                 UserInfo = registerRequest.UserInfo,
                 Achievement = registerRequest.Achievement,
                 Image = registerRequest.Image,
-                CreatedAt = DateTime.UtcNow
             };
 
             // 3. Добавляем в базу данных
