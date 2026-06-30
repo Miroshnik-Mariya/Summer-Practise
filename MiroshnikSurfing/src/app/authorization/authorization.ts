@@ -3,11 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { HeaderSmall } from '../header-small/header-small';
+import { UserService, AuthResponse } from '../services/user.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-authorization',
   standalone: true,
-  imports: [HeaderSmall, FormsModule, CommonModule, RouterLink],
+  imports: [HeaderSmall, FormsModule, CommonModule, RouterLink, HttpClientModule],
   templateUrl: './authorization.html',
   styleUrls: ['./authorization.css']
 })
@@ -24,19 +26,12 @@ export class Authorization implements AfterViewInit {
 
   @ViewChild('loginInput') loginInput!: ElementRef;
 
-  // База данных пользователей (для демонстрации)
-  private users = [
-    { login: 'user1', password: 'password123' },
-    { login: 'user2', password: 'qwerty123' },
-    { login: 'admin', password: 'admin123' },
-    { login: 'test@mail.com', password: 'test123' },
-    { login: 'Михаил', password: 'misha123' }
-  ];
-
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) {}
 
   ngAfterViewInit() {
-    // Автофокус на поле логина при загрузке
     setTimeout(() => {
       this.loginInput?.nativeElement?.focus();
     }, 100);
@@ -44,7 +39,6 @@ export class Authorization implements AfterViewInit {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
-    // Фокус на поле пароля после переключения видимости
     setTimeout(() => {
       const passwordInput = document.getElementById('password') as HTMLInputElement;
       if (passwordInput) {
@@ -54,62 +48,65 @@ export class Authorization implements AfterViewInit {
   }
 
   onSubmit() {
+    console.log('onSubmit() CALLED');
+    
     this.isSubmitted = true;
     this.errorMessage = '';
 
-    // Проверка на пустые поля
     if (!this.user.login || !this.user.password) {
-      this.errorMessage = 'Заполнены не все поля!';
+      this.errorMessage = 'Fill in all fields';
       return;
     }
 
-    // Проверка формата логина (латиница, кириллица, цифры, подчеркивания, @ и . для email)
-    const loginRegex = /^[a-zA-Zа-яА-ЯёЁ0-9_@.]+$/;
-    if (!loginRegex.test(this.user.login)) {
-      this.errorMessage = 'Логин содержит недопустимые символы';
-      return;
-    }
-
-    // Проверка пароля (минимум 6 символов)
     if (this.user.password.length < 6) {
-      this.errorMessage = 'Пароль должен содержать минимум 6 символов';
+      this.errorMessage = 'Password must be at least 6 characters';
       return;
     }
 
     this.isLoading = true;
 
-    // Имитация запроса к серверу
-    setTimeout(() => {
-      this.isLoading = false;
-      
-      // Проверка существования пользователя
-      const user = this.users.find(u => u.login === this.user.login);
-      
-      if (!user) {
-        this.errorMessage = 'Пользователя не существует!';
-        return;
+    this.userService.login({
+      login: this.user.login,
+      password: this.user.password
+    }).subscribe({
+      next: (response: AuthResponse) => {
+        console.log('Login successful:', response);
+        this.isLoading = false;
+        
+        if (response.user) {
+          const authData = window.btoa(this.user.login + ':' + this.user.password);
+          const userInfo = {
+            nickname: response.user.nickname,
+            photo: response.user.image || '',
+            authData: authData
+          };
+          localStorage.setItem('userInfo', JSON.stringify(userInfo));
+          localStorage.setItem('isAuthenticated', 'true');
+        }
+        
+        this.router.navigate(['']);
+      },
+      error: (error) => {
+        console.log('Login error:', error);
+        this.isLoading = false;
+        
+        if (error.status === 0) {
+          this.errorMessage = 'Server unavailable. Check if backend is running (localhost:5001)';
+        } else if (error.error?.message) {
+          this.errorMessage = error.error.message;
+        } else {
+          this.errorMessage = 'Invalid login or password';
+        }
       }
-
-      // Проверка пароля
-      if (user.password !== this.user.password) {
-        this.errorMessage = 'Введены неверные данные!';
-        return;
-      }
-
-      // Успешный вход - переход на ленту новостей
-      console.log('Вход выполнен:', this.user);
-      this.router.navigate(['/feed']);
-    }, 1500);
+    });
   }
 
-  // Сброс ошибок при вводе
   onInputChange() {
     if (this.isSubmitted) {
       this.errorMessage = '';
     }
   }
 
-  // Проверка поля на ошибку
   isFieldInvalid(fieldName: string): boolean {
     if (!this.isSubmitted) return false;
     
@@ -126,20 +123,19 @@ export class Authorization implements AfterViewInit {
     return false;
   }
 
-  // Получение ошибки для поля
   getFieldError(fieldName: string): string {
     if (!this.isSubmitted) return '';
     
     const control = this.user[fieldName as keyof typeof this.user];
     
     if (fieldName === 'login') {
-      if (!control) return 'Поле обязательно для заполнения';
+      if (!control) return 'Field is required';
       return '';
     }
     
     if (fieldName === 'password') {
-      if (!control) return 'Поле обязательно для заполнения';
-      if (control.length < 6) return 'Минимум 6 символов';
+      if (!control) return 'Field is required';
+      if (control.length < 6) return 'Minimum 6 characters';
       return '';
     }
     

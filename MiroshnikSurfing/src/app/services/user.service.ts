@@ -3,7 +3,6 @@ import { EventEmitter, Inject, Injectable, Output } from "@angular/core";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 
-// ✅ ИНТЕРФЕЙСЫ ДОЛЖНЫ БЫТЬ ОПРЕДЕЛЕНЫ ДО КЛАССА
 export interface UserInfo {
     nickname: string;
     photo: string;
@@ -20,6 +19,11 @@ export interface RegisterRequest {
     userInfo?: string;
     achievement?: string;
     image?: string;
+}
+
+export interface LoginRequest {
+    login: string;      // может быть email или nickname
+    password: string;
 }
 
 export interface AuthResponse {
@@ -40,8 +44,10 @@ export class UserService {
         private router: Router
     ) {}
 
-    // ✅ МЕТОД РЕГИСТРАЦИИ
+    // МЕТОД РЕГИСТРАЦИИ
     register(registerData: RegisterRequest): Observable<AuthResponse> {
+        console.log('UserService.register called:', registerData);
+        
         const formData = new FormData();
         formData.append('nickname', registerData.nickname);
         formData.append('email', registerData.email);
@@ -56,7 +62,18 @@ export class UserService {
         return this.http.post<AuthResponse>(this.baseUrl + '/Register', formData);
     }
 
-    // Метод для входа
+    // НОВЫЙ МЕТОД ДЛЯ ВХОДА (по email или nickname)
+    login(loginData: LoginRequest): Observable<AuthResponse> {
+    console.log('UserService.login called:', loginData);
+    
+    const formData = new FormData();
+    formData.append('nickname', loginData.login);  // ← ДОЛЖНО БЫТЬ 'nickname'!
+    formData.append('password', loginData.password);
+    
+    return this.http.post<AuthResponse>(this.baseUrl + '/Login', formData);
+}
+
+    // СТАРЫЙ МЕТОД (оставляем для совместимости)
     nickname(nickname: string, password: string) {
         const formData = new FormData();
         formData.append('nickname', nickname);
