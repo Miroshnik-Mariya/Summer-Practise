@@ -1,40 +1,50 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HeaderSmall } from '../header-small/header-small';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
+import { UserService } from '../services/user.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-register-component',
-  imports: [FormsModule, CommonModule, HeaderSmall, RouterLink],
+  standalone: true,
+  imports: [FormsModule, CommonModule, HeaderSmall, RouterLink, HttpClientModule],
   templateUrl: './registration.html',
   styleUrl: './registration.css',
 })
-export class Registration {
-  // Модель пользователя
+export class Registration implements OnInit {
   user = {
     nickname: '',
     email: '',
     password: '',
-    firstname: '',
-    lastname: '',
-    contacts: '',
-    aboutMyself: '',
-    achievements: '',
-    photo: ''
+    name: '',
+    surname: '',
+    contactInfo: '',
+    userInfo: '',
+    achievement: '',
+    image: ''
   };
 
-  // поле для повторного ввода пароля
-  repeatedPassword: string = '';  // <-- Этого не хватало!
-
-  // UI состояния
   showPassword = false;
   isSubmitted = false;
   isLoading = false;
+  errorMessage = '';
 
   @ViewChild('registerForm') registerForm!: NgForm;
 
-  // --- Геттеры для валидации ---
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) {
+    console.log('Registration constructor called');
+  }
+
+  ngOnInit() {
+    console.log('Registration ngOnInit called');
+    console.log('UserService:', this.userService);
+  }
+
   get isNicknameValid(): boolean {
     const len = this.user.nickname.length;
     return len >= 3 && len <= 20;
@@ -50,52 +60,51 @@ export class Registration {
     return pass.length >= 6 && pass.length <= 20 && regex.test(pass);
   }
 
-  get isFirstnameValid(): boolean {
-    return this.user.firstname.length <= 31;
+  get isNameValid(): boolean {
+    return this.user.name.length <= 31;
   }
 
-  get isLastnameValid(): boolean {
-    return this.user.lastname.length <= 31;
+  get isSurnameValid(): boolean {
+    return this.user.surname.length <= 31;
   }
 
-  get isContactsValid(): boolean {
-    return this.user.contacts.length <= 255;
+  get isContactInfoValid(): boolean {
+    return this.user.contactInfo.length <= 255;
   }
 
-  get isAboutMyselfValid(): boolean {
-    return this.user.aboutMyself.length <= 255;
+  get isUserInfoValid(): boolean {
+    return this.user.userInfo.length <= 255;
   }
 
-  get isAchievementsValid(): boolean {
-    return this.user.achievements.length <= 255;
+  get isAchievementValid(): boolean {
+    return this.user.achievement.length <= 255;
   }
 
-  // Проверка совпадения паролей
-  get passwordsMatch(): boolean {
-    return this.user.password === this.repeatedPassword;
-  }
-
-  // --- Методы ---
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
   onFileSelected(event: any) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      this.user.photo = e.target.result; // Сохраняем как base64
-    };
-    reader.readAsDataURL(file);
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.user.image = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
-}
 
   onSubmit() {
-    this.isSubmitted = true;
+    console.log('onSubmit() CALLED');
     
-    if (this.registerForm?.invalid || !this.passwordsMatch) {
-      // Прокручиваем к первому полю с ошибкой
+    this.isSubmitted = true;
+    this.errorMessage = '';
+    
+    console.log('registerForm invalid:', this.registerForm?.invalid);
+    
+    if (this.registerForm?.invalid) {
+      console.log('Form is invalid');
       const firstInvalid = document.querySelector('.is-invalid');
       if (firstInvalid) {
         firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -103,15 +112,34 @@ export class Registration {
       return;
     }
 
-    // Если все ок - отправляем
-    this.isLoading = true;
-    console.log('Регистрация:', this.user);
+    console.log('Form is valid');
+    console.log('User data:', this.user);
     
-    // Симуляция отправки
-    setTimeout(() => {
-      this.isLoading = false;
-      // Здесь редирект или сообщение об успехе
-    }, 2000);
+    this.isLoading = true;
+
+    console.log('Sending to server...');
+    this.userService.register({
+      nickname: this.user.nickname,
+      email: this.user.email,
+      password: this.user.password,
+      name: this.user.name || undefined,
+      surname: this.user.surname || undefined,
+      contactInfo: this.user.contactInfo || undefined,
+      userInfo: this.user.userInfo || undefined,
+      achievement: this.user.achievement || undefined,
+      image: this.user.image || undefined
+    }).subscribe({
+      next: (response) => {
+        console.log('Registration SUCCESS:', response);
+        this.isLoading = false;
+        this.router.navigate(['']);
+      },
+      error: (error) => {
+        console.log('Registration ERROR:', error);
+        this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Registration error';
+      }
+    });
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -124,12 +152,12 @@ export class Registration {
     if (!control || !control.errors) return '';
 
     const errors = control.errors;
-    if (errors['required']) return 'Поле обязательно для заполнения';
-    if (errors['minlength']) return `Минимум ${errors['minlength'].requiredLength} символов`;
-    if (errors['maxlength']) return `Максимум ${errors['maxlength'].requiredLength} символов`;
-    if (errors['pattern']) return 'Недопустимые символы';
-    if (errors['email']) return 'Введите корректный email';
-    return 'Неверное значение';
+    if (errors['required']) return 'Field is required';
+    if (errors['minlength']) return `Minimum ${errors['minlength'].requiredLength} characters`;
+    if (errors['maxlength']) return `Maximum ${errors['maxlength'].requiredLength} characters`;
+    if (errors['pattern']) return 'Invalid characters';
+    if (errors['email']) return 'Enter valid email';
+    return 'Invalid value';
   }
 
   shouldShowError(fieldName: string): boolean {

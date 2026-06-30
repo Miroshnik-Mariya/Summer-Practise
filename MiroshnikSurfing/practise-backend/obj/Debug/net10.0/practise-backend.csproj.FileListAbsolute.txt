@@ -82,3 +82,4 @@ C:\Users\79033\OneDrive\Документы\GitHub\Summer-Practise\MiroshnikSurfi
 C:\Users\79033\OneDrive\Документы\GitHub\Summer-Practise\MiroshnikSurfing\practise-backend\obj\Debug\net10.0\practise-backend.pdb
 C:\Users\79033\OneDrive\Документы\GitHub\Summer-Practise\MiroshnikSurfing\practise-backend\obj\Debug\net10.0\practise-backend.genruntimeconfig.cache
 C:\Users\79033\OneDrive\Документы\GitHub\Summer-Practise\MiroshnikSurfing\practise-backend\obj\Debug\net10.0\ref\practise-backend.dll
+C:\Users\79033\OneDrive\Документы\GitHub\Summer-Practise\MiroshnikSurfing\practise-backend\bin\Debug\net10.0\practise-backend.staticwebassets.runtime.json
