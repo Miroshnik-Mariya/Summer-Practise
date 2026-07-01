@@ -1,3 +1,4 @@
+// authorization.ts
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -70,20 +71,8 @@ export class Authorization implements AfterViewInit {
       password: this.user.password
     }).subscribe({
       next: (response: AuthResponse) => {
-        console.log('Login successful:', response);
+        console.log('Login successful');
         this.isLoading = false;
-        
-        if (response.user) {
-          const authData = window.btoa(this.user.login + ':' + this.user.password);
-          const userInfo = {
-            nickname: response.user.nickname,
-            photo: response.user.image || '',
-            authData: authData
-          };
-          localStorage.setItem('userInfo', JSON.stringify(userInfo));
-          localStorage.setItem('isAuthenticated', 'true');
-        }
-        
         this.router.navigate(['']);
       },
       error: (error) => {

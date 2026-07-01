@@ -1,7 +1,9 @@
+// services/user.service.ts
 import { HttpClient } from "@angular/common/http";
 import { EventEmitter, Inject, Injectable, Output } from "@angular/core";
 import { Router } from "@angular/router";
-import { Observable } from "rxjs";
+import { Observable, BehaviorSubject } from "rxjs";
+import { tap } from 'rxjs/operators';
 
 export interface UserInfo {
     nickname: string;
@@ -22,7 +24,7 @@ export interface RegisterRequest {
 }
 
 export interface LoginRequest {
-    login: string;      // может быть email или nickname
+    login: string;
     password: string;
 }
 
@@ -36,7 +38,9 @@ export interface AuthResponse {
 })
 export class UserService {
     @Output() authChanged: EventEmitter<any> = new EventEmitter();
-    @Output() errors: EventEmitter<any> = new EventEmitter();
+    
+    private authStatusSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
+    public authStatus$ = this.authStatusSubject.asObservable();
 
     constructor(
         private http: HttpClient,
@@ -44,7 +48,6 @@ export class UserService {
         private router: Router
     ) {}
 
-    // МЕТОД РЕГИСТРАЦИИ
     register(registerData: RegisterRequest): Observable<AuthResponse> {
         console.log('UserService.register called:', registerData);
         
@@ -62,59 +65,95 @@ export class UserService {
         return this.http.post<AuthResponse>(this.baseUrl + '/Register', formData);
     }
 
-    // НОВЫЙ МЕТОД ДЛЯ ВХОДА (по email или nickname)
     login(loginData: LoginRequest): Observable<AuthResponse> {
-    console.log('UserService.login called:', loginData);
-    
-    const formData = new FormData();
-    formData.append('nickname', loginData.login);  // ← ДОЛЖНО БЫТЬ 'nickname'!
-    formData.append('password', loginData.password);
-    
-    return this.http.post<AuthResponse>(this.baseUrl + '/Login', formData);
-}
-
-    // СТАРЫЙ МЕТОД (оставляем для совместимости)
-    nickname(nickname: string, password: string) {
+        console.log('UserService.login called:', loginData);
+        
         const formData = new FormData();
-        formData.append('nickname', nickname);
-        formData.append('password', password);
-
-        this.http.post(this.baseUrl + '/Login', formData).subscribe({
-            next: (user: any) => {
-                const authData = window.btoa(nickname + ':' + password);
-                const userInfo: UserInfo = {
-                    nickname: nickname,
-                    photo: user.photo,
-                    authData: authData
-                };
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                localStorage.setItem('isAuthenticated', 'true');
-
-                this.authChanged.emit();
-                this.router.navigate(['/feed']);
-            },
-            error: (e) => {
-                this.errors.emit(e);
-            }
-        });
+        formData.append('nickname', loginData.login);
+        formData.append('password', loginData.password);
+        
+        return this.http.post<AuthResponse>(this.baseUrl + '/Login', formData).pipe(
+            tap({
+                next: (response: any) => {
+                    console.log('Login response:', response);
+                    
+                    // ✅ Бекенд возвращает пользователя напрямую
+                    // response - это сам пользователь, а не { user: ... }
+                    if (response && response.id && response.nickname) {
+                        console.log('User found:', response);
+                        
+                        const authData = window.btoa(loginData.login + ':' + loginData.password);
+                        const userInfo: UserInfo = {
+                            nickname: response.nickname,
+                            photo: response.image || '',
+                            authData: authData
+                        };
+                        
+                        console.log('UserInfo to save:', userInfo);
+                        
+                        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                        localStorage.setItem('isAuthenticated', 'true');
+                        
+                        console.log('Data saved to localStorage');
+                        console.log('localStorage userInfo:', localStorage.getItem('userInfo'));
+                        console.log('localStorage isAuthenticated:', localStorage.getItem('isAuthenticated'));
+                        
+                        console.log('Updating authStatus to true');
+                        this.authStatusSubject.next(true);
+                        
+                        console.log('Emitting authChanged');
+                        this.authChanged.emit();
+                    } else {
+                        console.log('WARNING: Invalid response structure:', response);
+                        console.log('Response keys:', Object.keys(response || {}));
+                    }
+                },
+                error: (error) => {
+                    console.log('Login error:', error);
+                }
+            })
+        );
     }
 
     logout() {
+        console.log('UserService.logout called');
         localStorage.removeItem('userInfo');
         localStorage.removeItem('isAuthenticated');
+        
+        this.authStatusSubject.next(false);
         this.authChanged.emit();
+        
         this.router.navigate(['/authorization']);
     }
 
     isAuthenticated(): boolean {
-        return localStorage.getItem('isAuthenticated') === 'true';
+        const result = localStorage.getItem('isAuthenticated') === 'true';
+        return result;
     }
 
     getUserInfo(): UserInfo | null {
         const userData = localStorage.getItem('userInfo');
         if (userData) {
-            return JSON.parse(userData) as UserInfo;
+            try {
+                return JSON.parse(userData) as UserInfo;
+            } catch {
+                return null;
+            }
         }
         return null;
+    }
+
+    refreshAuthStatus() {
+        console.log('refreshAuthStatus called');
+        const isAuth = this.isAuthenticated();
+        console.log('isAuthenticated:', isAuth);
+        
+        this.authStatusSubject.next(isAuth);
+        
+        if (isAuth) {
+            console.log('Emitting authChanged event');
+            this.authChanged.emit();
+        }
+        return isAuth;
     }
 }

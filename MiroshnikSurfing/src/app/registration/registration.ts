@@ -3,7 +3,7 @@ import { Component, ViewChild, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HeaderSmall } from '../header-small/header-small';
 import { RouterLink, Router } from '@angular/router';
-import { UserService } from '../services/user.service';
+import { UserService, AuthResponse } from '../services/user.service';
 import { HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -129,9 +129,25 @@ export class Registration implements OnInit {
       achievement: this.user.achievement || undefined,
       image: this.user.image || undefined
     }).subscribe({
-      next: (response) => {
+      next: (response: AuthResponse) => {
         console.log('Registration SUCCESS:', response);
         this.isLoading = false;
+        
+        // Сохраняем данные пользователя
+        if (response.user) {
+          const authData = window.btoa(this.user.nickname + ':' + this.user.password);
+          const userInfo = {
+            nickname: response.user.nickname,
+            photo: response.user.image || '',
+            authData: authData
+          };
+          localStorage.setItem('userInfo', JSON.stringify(userInfo));
+          localStorage.setItem('isAuthenticated', 'true');
+          
+          // ✅ Уведомляем все компоненты об изменении статуса
+          this.userService.authChanged.emit();
+        }
+        
         this.router.navigate(['']);
       },
       error: (error) => {

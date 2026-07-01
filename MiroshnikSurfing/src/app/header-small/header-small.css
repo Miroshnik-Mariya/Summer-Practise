@@ -1,11 +1,98 @@
-/* header-small.css */
+/* header-small.css
 .header-small {
-  background: #4C5768; /* Серый фон */
+  background: #4C5768; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 70px; /* Фиксированная высота */
+  height: 70px; 
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+}
+
+.header-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-link {
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 32px; 
+  color: #ffffff;
+  transition: opacity 0.3s;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
+.logo-text {
+  letter-spacing: 1px;
+  align-items: start;
+}
+
+
+.nav-desktop {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.nav-desktop a {
+  padding: 8px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.nav-desktop a:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #ffffff;
+}
+
+.nav-desktop a.active {
+  background: #ffffff;
+  color: white;
+}
+
+.nav-buttons {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 24px;
+  }
+  
+  .nav-desktop a {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+} */
+ 
+.header-small {
+  background: #4C5768;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 70px;
   display: flex;
   align-items: center;
   border-radius: 20px;
@@ -30,7 +117,7 @@
 .logo-link {
   text-decoration: none;
   font-weight: 700;
-  font-size: 32px; /* Крупный шрифт */
+  font-size: 32px;
   color: #ffffff;
   transition: opacity 0.3s;
 }
@@ -62,17 +149,80 @@
 }
 
 .nav-desktop a:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
 
 .nav-desktop a.active {
   background: #ffffff;
-  color: white;
+  color: #4C5768;
 }
 
 .nav-buttons {
   font-size: 14px;
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.nav-buttons:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* User Menu (авторизованный пользователь) */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: background 0.3s;
+  text-decoration: none;
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+}
+
+.user-nickname {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Кнопка выхода */
+.logout-btn {
+  background: rgba(255, 82, 82, 0.15);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  color: #ffffff;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 82, 82, 0.3);
+  border-color: #ff5252;
 }
 
 /* Адаптив для мобильных */
@@ -84,5 +234,38 @@
   .nav-desktop a {
     padding: 6px 12px;
     font-size: 13px;
+  }
+  
+  .nav-buttons {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .user-nickname {
+    font-size: 12px;
+  }
+  
+  .user-avatar {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .user-info {
+    padding: 3px 8px 3px 3px;
+  }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+  .user-nickname {
+    display: none;
+  }
+  
+  .user-info {
+    padding: 3px;
+  }
+  
+  .nav-desktop {
+    gap: 8px;
   }
 }

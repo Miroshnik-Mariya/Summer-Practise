@@ -1,21 +1,39 @@
-<!-- header-small.html -->
 <header class="header-small">
   <div class="header-container">
     <!-- Логотип -->
     <div class="logo">
-      <a routerLink="/feed" class="logo-link">
+      <a routerLink="/" class="logo-link">
         <span class="logo-text">SURF.RU</span>
       </a>
     </div>
 
-    <!-- Навигация (десктоп) -->
+    <!-- Навигация -->
     <nav class="nav-desktop">
-      <a routerLink="/authorization" routerLinkActive="active">
-        <span class="nav-buttons">Войти</span>
-      </a>
-      <a routerLink="/registration" routerLinkActive="active">
-        <span class="nav-buttons">Регистрация</span>
-      </a>
+      <!-- Если пользователь авторизован -->
+      <div *ngIf="isAuthenticated; else notLoggedIn" class="user-menu">
+        <div class="user-info">
+          <img 
+            [src]="userPhoto" 
+            alt="Avatar" 
+            class="user-avatar"
+            (error)="userPhoto = 'assets/default-avatar.png'"
+          >
+          <span class="user-nickname">{{ userNickname }}</span>
+        </div>
+        <button class="nav-buttons logout-btn" (click)="logout()">
+          Выйти
+        </button>
+      </div>
+
+      <!-- Если пользователь НЕ авторизован -->
+      <ng-template #notLoggedIn>
+        <a routerLink="/authorization" routerLinkActive="active">
+          <span class="nav-buttons">Войти</span>
+        </a>
+        <a routerLink="/registration" routerLinkActive="active">
+          <span class="nav-buttons">Регистрация</span>
+        </a>
+      </ng-template>
     </nav>
   </div>
 </header>
