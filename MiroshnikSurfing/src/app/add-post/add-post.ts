@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HeaderSmall } from '../header-small/header-small';
+import { PostService } from '../services/services/post';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-add-post',
@@ -12,6 +14,8 @@ import { HeaderSmall } from '../header-small/header-small';
   styleUrl: './add-post.css',
 })
 export class AddPost {
+  @Output() postCreated = new EventEmitter<void>();
+  
   post = {
     content: '',
     image: ''
@@ -22,19 +26,20 @@ export class AddPost {
   isLoading = false;
   errorMessage = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private postService: PostService,
+    private userService: UserService
+  ) {}
 
-  // Выбор файла
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Проверка размера (максимум 5MB)
       if (file.size > 5 * 1024 * 1024) {
         this.errorMessage = 'Размер файла не должен превышать 5MB';
         return;
       }
 
-      // Проверка типа
       if (!file.type.startsWith('image/')) {
         this.errorMessage = 'Пожалуйста, выберите изображение';
         return;
@@ -43,17 +48,15 @@ export class AddPost {
       this.selectedFile = file;
       this.errorMessage = '';
 
-      // Превью изображения
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.imagePreview = e.target.result;
-        this.post.image = e.target.result; // Сохраняем как base64
+        this.post.image = e.target.result;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // Удалить изображение
   removeImage() {
     this.selectedFile = null;
     this.imagePreview = null;
@@ -64,30 +67,59 @@ export class AddPost {
     }
   }
 
-  // Отправка поста
   onSubmit() {
     if (!this.post.content.trim()) {
       this.errorMessage = 'Введите текст поста';
       return;
     }
 
+    const userInfo = this.userService.getUserInfo();
+    if (!userInfo) {
+      this.errorMessage = 'Пожалуйста, войдите в систему';
+      return;
+    }
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Имитация отправки поста
-    setTimeout(() => {
-      this.isLoading = false;
-      console.log('Пост создан:', {
-        content: this.post.content,
-        image: this.post.image,
-        file: this.selectedFile
-      });
-      // Возвращаемся на ленту
-      this.router.navigate(['/feed']);
-    }, 1500);
+    let photoBase64 = '';
+    if (this.selectedFile) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        photoBase64 = e.target.result;
+        this.sendPost(photoBase64);
+      };
+      reader.readAsDataURL(this.selectedFile);
+    } else {
+      this.sendPost('');
+    }
   }
 
-  // Отмена
+  sendPost(photoBase64: string) {
+    const userInfo = this.userService.getUserInfo();
+    
+    this.postService.createPost({
+      text: this.post.content,
+      photo: photoBase64,
+      authorNickname: userInfo?.nickname || ''
+    }).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.post.content = '';
+        this.post.image = '';
+        this.selectedFile = null;
+        this.imagePreview = null;
+        this.postCreated.emit();
+        this.router.navigate(['/feed']);
+      },
+      error: (error) => {
+        console.error('Error creating post:', error);
+        this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Ошибка при создании поста';
+      }
+    });
+  }
+
   goBack() {
     this.router.navigate(['/feed']);
   }

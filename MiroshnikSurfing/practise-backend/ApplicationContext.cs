@@ -25,6 +25,19 @@ public class ApplicationContext : DbContext
         }
     }
 
+    // ApplicationContext.cs
+    public DbSet<Like> Likes { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // ...
+        modelBuilder.Entity<Like>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.PostId, e.UserId }).IsUnique();
+        });
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=SMS-IT;Username=postgres;Password=1111");
